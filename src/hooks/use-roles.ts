@@ -21,7 +21,10 @@ export function useRoles() {
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.warn("Could not fetch user roles:", error.message);
+        }
         setRoles(((data ?? []) as { role: AppRole }[]).map((r) => r.role));
         setLoading(false);
       });

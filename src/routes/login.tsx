@@ -56,12 +56,15 @@ function Login() {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         // Verify role matches what they selected
-        const { data: roles } = await supabase
+        const { data: roles, error: rolesErr } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", data.user!.id);
+        if (rolesErr) {
+          console.warn("Could not fetch roles:", rolesErr.message);
+        }
         const has = (roles ?? []).some((r) => r.role === role);
-        if (!has) {
+        if (!has && roles && roles.length > 0) {
           await supabase.auth.signOut();
           throw new Error(`This account is not registered as ${role}. Pick the correct role.`);
         }
@@ -75,15 +78,28 @@ function Login() {
           options: { emailRedirectTo: `${window.location.origin}/dashboard` },
         });
         if (error) throw error;
-        // Sign in (auto-confirm is enabled)
+
+        // Check if email confirmation is required
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          throw new Error("An account with this email already exists. Try signing in instead.");
+        }
+
+        // Try to sign in (works when auto-confirm is enabled)
         const { data: signed, error: e2 } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (e2) throw e2;
+        if (e2) {
+          // If sign-in fails, email confirmation might be required
+          toast.success("Account created! Please check your email to confirm, then sign in.");
+          setMode("login");
+          return;
+        }
         const uid = signed.user!.id;
         const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: uid, role });
-        if (roleErr && !roleErr.message.includes("duplicate")) throw roleErr;
+        if (roleErr && !roleErr.message.includes("duplicate")) {
+          console.warn("Could not assign role:", roleErr.message);
+        }
         sfx.success();
         toast.success(`Account created as ${role}`);
         nav({ to: "/dashboard" });

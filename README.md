@@ -7,18 +7,21 @@ Welcome to the **Student Information System (SIS)**, a modern, futuristic comman
 ## 🚀 Key Features
 
 ### 👨‍🎓 1. Student Portal
+
 - **Dashboard & Performance Overview**: View GPA, grade categories, and grade calculations dynamically.
 - **Verification QR Code**: Generate custom, download-ready QR codes linking to student profile pages.
 - **Profile Export**: Download individual student details in a styled, formatted PDF sheet.
 - **Academic Rankings**: View the class leaderboard containing peer ranks.
 
 ### 👩‍🏫 2. Teacher Portal
+
 - **Camera-Based QR Scanner**: Use the device camera to scan students' QR codes and instantly view their full profiles.
 - **Full student CRUD**: Create, edit, and delete student records directly from a tabular directory.
 - **Roster Exporting**: Download complete student rosters as CSV files.
 - **Global Leaderboard**: Track highest, average, and lowest class scores.
 
 ### 👑 3. Admin Command Center
+
 - **System Administration**: Full administrative override permissions on all directories.
 - **Role Assignment**: Manage roles (`student`, `teacher`, `admin`) for auth users to secure endpoints.
 - **Supabase Integration**: Seamless syncing and real-time validation via Supabase backend.
@@ -73,21 +76,27 @@ Student-Information-System-main/
 The system consists of three main tables:
 
 ### 1. `profiles`
+
 Stores general metadata of users who sign up through Supabase Auth.
+
 - `id` (uuid, Primary Key): Links to auth user ID.
 - `created_at` (timestamp)
 - `display_name` (text, nullable)
 - `email` (text, nullable)
 
 ### 2. `user_roles`
+
 Tracks assigned application permissions.
+
 - `id` (uuid, Primary Key)
 - `created_at` (timestamp)
 - `user_id` (uuid, Foreign Key referencing `profiles.id`)
 - `role` (enum `app_role` - `'admin' | 'teacher' | 'student'`)
 
 ### 3. `students`
+
 Holds all academic records.
+
 - `id` (uuid, Primary Key)
 - `roll_no` (text): Student's identifier number.
 - `name` (text)
@@ -107,56 +116,59 @@ Holds all academic records.
 ## 🔄 System Workflows
 
 ### Student Workflow
+
 ```mermaid
 graph TD
     A[Student Login] --> B{Role Authenticated?}
     B -- Yes --> C[Student Dashboard]
     B -- No --> LogError[Access Denied / Redirect]
-    
+
     C --> D[View Personal Profile Details]
     C --> E[View Academic Marks & Grades]
     C --> F[View Class Leaderboard & Rankings]
     C --> G[View Personal QR Code for Verification]
-    
+
     G --> H[Export Profile to PDF]
 ```
 
 ### Teacher Workflow
+
 ```mermaid
 graph TD
     A[Teacher Login] --> B{Role Authenticated?}
     B -- Yes --> C[Staff Dashboard]
     B -- No --> LogError[Access Denied]
-    
+
     C --> D[Scan Student QR Code]
     D --> D1[Resolve QR to Student Profile Page]
-    
+
     C --> E[Students Roster Directory]
     E --> E1[Add New Student Record]
     E --> E2[Edit Existing Student Details]
     E --> E3[Delete Student Record]
     E --> E4[Export Roster to CSV]
-    
+
     C --> F[View Global Academic Leaderboard]
     C --> G[Toggle System SFX Sounds]
 ```
 
 ### Admin Workflow
+
 ```mermaid
 graph TD
     A[Admin Login] --> B{Role Authenticated?}
     B -- Yes --> C[Admin Command Center]
     B -- No --> LogError[Access Denied]
-    
+
     C --> D[All Staff & Teacher Capabilities]
     D --> D1[Scan Student QR Codes]
     D --> D2[Full CRUD on Student Records]
     D --> D3[Import/Export CSV data]
-    
+
     C --> E[Role Authorization Management]
     E --> E1[View User Profiles]
     E --> E2[Assign/Revoke Roles: admin, teacher, student]
-    
+
     C --> F[Supabase Database Configuration]
 ```
 
@@ -167,11 +179,14 @@ graph TD
 Follow these steps to run the application locally on your machine.
 
 ### Prerequisites
+
 - Node.js (v18 or higher recommended)
 - NPM
 
 ### 1. Setup Environment Variables
+
 Create a `.env` file in the root directory:
+
 ```env
 SUPABASE_PROJECT_ID="your-supabase-project-id"
 SUPABASE_PUBLISHABLE_KEY="your-anon-publishable-key"
@@ -182,30 +197,39 @@ VITE_SUPABASE_URL="https://your-project-id.supabase.co"
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Run Development Server
+
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:8080/](http://localhost:8080/) in your browser to view the application.
 
 ### 4. Code Quality & Formatting
+
 Run prettier to auto-format files:
+
 ```bash
 npm run format
 ```
 
 Run ESLint to check for code standard violations:
+
 ```bash
 npm run lint
 ```
 
 ### 5. Build for Production
+
 Create the compiled bundle ready for deployment:
+
 ```bash
 npm run build
 ```
+
 The output will be created inside the `.output` directory.
